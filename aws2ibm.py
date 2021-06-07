@@ -22,17 +22,18 @@ def run():
     )
 
     client_aws = create_client_aws(
-        protocol = "x-amzn-mqtt-ca",
-        endpoint = os.environ["AWS_MQTT_ENDPOINT"],
-        ca = os.environ["AWS_MQTT_CA"],
-        cert = os.environ["AWS_MQTT_CERT"],
-        private = os.environ["AWS_MQTT_PRIVATE_KEY"],
-        port = int(os.environ["AWS_MQTT_PORT"]),
-        client_out = client_out
+        protocol="x-amzn-mqtt-ca",
+        endpoint=os.environ["AWS_MQTT_ENDPOINT"],
+        ca=os.environ["AWS_MQTT_CA"],
+        cert=os.environ["AWS_MQTT_CERT"],
+        private=os.environ["AWS_MQTT_PRIVATE_KEY"],
+        port=int(os.environ["AWS_MQTT_PORT"]),
+        client_out=client_out,
     )
 
     client_aws.loop_forever()
     # client_out.loop_forever()
+
 
 def create_client_aws(protocol, endpoint, ca, cert, private, port, client_out):
     """Creating an MQTT Client Object"""
@@ -50,6 +51,7 @@ def create_client_aws(protocol, endpoint, ca, cert, private, port, client_out):
     client.connect(endpoint, port=port)
     return client
 
+
 def on_message_aws(client, userdata, message):
     """When a message is sent to a subscribed topic,
     decode the message and send it to another method"""
@@ -63,12 +65,14 @@ def on_message_aws(client, userdata, message):
     except BaseException as exception:
         print(exception)
 
+
 def on_connect_aws(client, userdata, flags, resultcode):
     """Upon connecting to an MQTT server, subscribe to the topic"""
 
     topic = "grillo-openeew/traces/+"
     print(f"✅ Subscribed to sensor data with result code {resultcode}")
     client.subscribe(topic)
+
 
 def create_client_out(host, port, username, password, clientid, cafile=None):
     """Creating an MQTT Client Object"""
@@ -87,6 +91,7 @@ def create_client_out(host, port, username, password, clientid, cafile=None):
     print(f"✅ Redirecting sensor data to another mqtt")
     return client
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
 
     run()
