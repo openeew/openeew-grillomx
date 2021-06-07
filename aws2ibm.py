@@ -13,12 +13,12 @@ def run():
 
     # create a client
     client_out = create_client_out(
-        host=os.environ["CUS_MQTT_HOST"],
-        port=int(os.environ["CUS_MQTT_PORT"]),
-        username=os.environ["CUS_MQTT_USERNAME"],
-        password=os.environ["CUS_MQTT_PASSWORD"],
-        clientid=os.environ["CUS_MQTT_CLIENTID"] + "trace",
-        # cafile=os.environ["CUS_MQTT_CERT"],
+        host=os.environ["MQTT_HOST"],
+        port=int(os.environ["MQTT_PORT"]),
+        username=os.environ["MQTT_USERNAME"],
+        password=os.environ["MQTT_PASSWORD"],
+        clientid=os.environ["MQTT_CLIENTID"] + "_rec_mx",
+        cafile=os.environ["MQTT_CERT"],
     )
 
     client_aws = create_client_aws(
@@ -55,19 +55,10 @@ def on_message_aws(client, userdata, message):
     decode the message and send it to another method"""
     try:
         decoded_message = str(message.payload.decode("utf-8", "ignore"))
-        data = json.loads(decoded_message)
 
-        device_id = data["device_id"]
-        x = data["traces"][0]["x"]
-        y = data["traces"][0]["y"]
-        z = data["traces"][0]["z"]
-        sr = data["traces"][0]["sr"]
+        topic = "iot-2/type/OpenEEW/id/MX/evt/status/fmt/json"
 
-        data = {"device_id": device_id, "x": x, "y": y, "z": z, "sr": sr}
-        json_str = json.dumps(data)
-
-        topic = "iot-2/type/OpenEEW/id/MX/evt/trace/fmt/json"
-        userdata.publish(topic, json.dumps(json_str))
+        userdata.publish(topic, decoded_message)
 
     except BaseException as exception:
         print(exception)
@@ -86,8 +77,10 @@ def create_client_out(host, port, username, password, clientid, cafile=None):
     if username and password:
         client.username_pw_set(username=username, password=password)
 
-    if cafile:
+    try:
         client.tls_set(ca_certs=cafile)
+    except:
+        print("Proceeding without certificate file")
 
     client.connect(host=host, port=port)
 
