@@ -1,10 +1,6 @@
 """This script receives trace data from MQTT by subscribing to a topic"""
-import json
-from argparse import ArgumentParser
 from paho.mqtt.client import Client as MqttClient
-import datetime
 import os
-import sys
 import ssl
 
 
